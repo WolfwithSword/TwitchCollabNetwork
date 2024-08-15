@@ -62,3 +62,12 @@ See [Twitch Developer Docs](https://dev.twitch.tv/docs/api/get-started/) on how 
 client_id: `your_dev_app_client_id`
 
 client_secret: `you_dev_app_client_secret`
+
+# FAQ
+
+- It Crashed!
+  - Yeah this is a proof of concept still
+- It's missing collabs I did recently!
+  - This can only grab from users mentioned in twitch vod titles with an `@`. Additionally, Twitch saves this information of your vod title *the moment* you go live. If you edit it in during stream, it will not work as expected. Set up your titles before going live for best results.
+- I have a bunch of red nodes!
+  - Red nodes mean you hit limits of either users or depth or other during processing. You can expand the values in the config at cost of processing time and load time. 
