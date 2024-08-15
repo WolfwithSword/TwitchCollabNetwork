@@ -1,3 +1,7 @@
+output.html
+lib/
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
