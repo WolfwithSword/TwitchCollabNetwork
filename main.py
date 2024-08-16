@@ -7,7 +7,7 @@ import re
 import configparser
 
 import networkx as nx
-from pyvis.network import Network #0.3.1
+from pyvis.network import Network #0.3.2
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -153,8 +153,10 @@ async def twitch_run():
                   heading=f"Twitch Collab Network: {PRIMARY_CHANNEL}<br>Depth: {depth}, Connections: {len(users)}",
                   select_menu=False, filter_menu=True, neighborhood_highlight=True)
     net.from_nx(G)
-    net.write_html(name="output.html", notebook=False, local=True)
-    #net.show("output.html")
+    options = '{"nodes": {"borderWidth": 5}}'
+    #net.show_buttons(filter_=True) # If uncommenting, do not set_options below
+    net.set_options(options)
+    net.write_html(name="output.html", notebook=False, local=True, open_browser=False)
 
 
 def all_done(users: dict, depth: int):
