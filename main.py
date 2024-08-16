@@ -1,11 +1,14 @@
+import asyncio
+import re, time
+import os
+
+import configparser
+from datetime import datetime
+
 from twitchAPI.object.api import TwitchUser, Video
 from twitchAPI.type import SortMethod, VideoType
 from twitchAPI.twitch import Twitch
 from twitchAPI.helper import first
-import asyncio
-import re, os
-import configparser
-from datetime import datetime
 
 import networkx as nx
 from pyvis.network import Network #0.3.2
@@ -87,6 +90,7 @@ class StreamerConnection(Streamer):
 
 
 async def twitch_run():
+    start_time = time.time()
     twitch = await Twitch(app_id=CLIENT_ID, app_secret=CLIENT_SECRET)
     users = dict()
     depth = 1
@@ -161,6 +165,10 @@ async def twitch_run():
     cwd = os.getcwd()
     net.set_template_dir(os.path.join(cwd, 'templates'), 'template.html')
     net.write_html(name="output.html", notebook=False, local=True, open_browser=False)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print("\nCompleted in {:.2f} seconds".format(elapsed_time))
 
 
 def all_done(users: dict, depth: int):
