@@ -3,8 +3,9 @@ from twitchAPI.type import SortMethod, VideoType
 from twitchAPI.twitch import Twitch
 from twitchAPI.helper import first
 import asyncio
-import re
+import re, os
 import configparser
+from datetime import datetime
 
 import networkx as nx
 from pyvis.network import Network #0.3.2
@@ -150,12 +151,15 @@ async def twitch_run():
     net = Network(notebook=False, height="1500px", width="100%",
                   bgcolor="#222222",
                   font_color="white",
-                  heading=f"Twitch Collab Network: {PRIMARY_CHANNEL}<br>Depth: {depth}, Connections: {len(users)}",
+                  heading=f"Twitch Collab Network: {PRIMARY_CHANNEL}<br>{datetime.today().strftime('%Y-%m-%d')}<br>Depth: {depth}, Connections: {len(users)}",
                   select_menu=False, filter_menu=True, neighborhood_highlight=True)
     net.from_nx(G)
     options = '{"nodes": {"borderWidth": 5}}'
     #net.show_buttons(filter_=True) # If uncommenting, do not set_options below
     net.set_options(options)
+
+    cwd = os.getcwd()
+    net.set_template_dir(os.path.join(cwd, 'templates'), 'template.html')
     net.write_html(name="output.html", notebook=False, local=True, open_browser=False)
 
 
