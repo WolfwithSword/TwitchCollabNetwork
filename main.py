@@ -33,6 +33,7 @@ if not PRIMARY_CHANNEL:
 else:
     PRIMARY_CHANNEL = PRIMARY_CHANNEL.lower().strip()
 
+
 CLIENT_ID = config.get(section='TWITCH', option='client_id', fallback=None)
 CLIENT_SECRET = config.get(section='TWITCH', option='client_secret', fallback=None)
 
@@ -86,21 +87,35 @@ class StreamerConnection(Streamer):
 
 async def twitch_run():
     twitch = await Twitch(app_id=CLIENT_ID, app_secret=CLIENT_SECRET)
-
-    primary_username = PRIMARY_CHANNEL
-    primary_user = await get_user_by_name(twitch, primary_username)
-
-    primary = StreamerConnection(primary_user)
-    primary.color = "green"
-
-    videos = await get_videos(twitch, primary.twitch_user)
-
     users = dict()
-    users[primary.name] = primary
-
     depth = 1
 
-    await find_connections_from_videos(twitch, videos, primary, users)
+    if "," in PRIMARY_CHANNEL:
+        # Multi primary user mode. You may want to increase max number of users if you have higher depths
+        primary_channel_names = list(map(str.strip, PRIMARY_CHANNEL.lower().split(',')))
+    else:
+        primary_channel_names = [PRIMARY_CHANNEL]
+
+    for primary_username in primary_channel_names:
+
+        primary_user = await get_user_by_name(twitch, primary_username)
+        if not primary_user:
+            continue
+
+        primary = StreamerConnection(primary_user)
+        primary.color = "green"
+
+        videos = await get_videos(twitch, primary.twitch_user)
+
+        users[primary.name] = primary
+
+        await find_connections_from_videos(twitch, videos, primary, users)
+
+    if len(users) == 0:
+        print("No valid primary channels were found. Please reconfigure the primary_channel(s)")
+        return
+
+    print(f"Done loading primary channels: {PRIMARY_CHANNEL}")
 
     while not all_done(users, depth):
         for user in list(users):
@@ -135,7 +150,7 @@ async def twitch_run():
     net = Network(notebook=False, height="1500px", width="100%",
                   bgcolor="#222222",
                   font_color="white",
-                  heading=f"Twitch Collab Network: {primary.name}<br><br>Depth: {depth}, Connections: {len(users)}",
+                  heading=f"Twitch Collab Network: {PRIMARY_CHANNEL}<br>Depth: {depth}, Connections: {len(users)}",
                   select_menu=False, filter_menu=True, neighborhood_highlight=True)
     net.from_nx(G)
     net.write_html(name="output.html", notebook=False, local=True)
@@ -155,7 +170,7 @@ async def find_connections_from_videos(twitch: Twitch, videos: list[Video], user
                                        users: dict):
     #print(f"Finding connections for {user.name}")
     for v in videos:
-        if len(users) > MAX_CONNECTIONS:
+        if len(users) >= MAX_CONNECTIONS:
             break
         if user.size >= MAX_CHILDREN:
             user.color = 'red'
@@ -170,13 +185,13 @@ async def find_connections_from_videos(twitch: Twitch, videos: list[Video], user
                     if u:
                         child = StreamerConnection(u)
                         user.add_child(child)
-                        child.add_child(user)
+                        child.add_child(user) #Bidirectional enforcement
                         users[child.name] = child
                 elif n not in [x.name for x in user.children]:
                     user.add_child(users[n])
-                    if user not in users[n].children:
-                        users[n].add_child(user)
-                if len(users) > MAX_CONNECTIONS:
+                    if user not in users[n].children: #Bidirectional enforcement
+                        users[n].add_child(user) #Bidirectional enforcement
+                if len(users) >= MAX_CONNECTIONS:
                     break
                 if user.size >= MAX_CHILDREN:
                     user.color = 'red'
@@ -186,6 +201,7 @@ async def find_connections_from_videos(twitch: Twitch, videos: list[Video], user
 
 
 async def get_user_by_name(twitch: Twitch, username: str):
+    # TODO: possibly optimize to fetch multiple per depth level at once
     user = await first(twitch.get_users(logins=[username]))
     if user and user.display_name.lower() == username.lower():
         return user

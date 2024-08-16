@@ -1,7 +1,7 @@
 # Twitch Collab Network
 Visualize the Twitch Collab Network between various streamers.
 
-This application takes in a primary channel to start with and will scan all available VODs (not highlights or clips) for tagged users.
+This application takes in a primary channel(s) to start with and will scan all available VODs (not highlights or clips) for tagged users.
 
 Any user tagged in a VOD title will have their VODs scanned and the process repeats until limits are reached.
 
@@ -13,7 +13,7 @@ This program is still quite experimental and is mainly a proof-of-concept as it 
 
 # Information
 
-- Green nodes indicate the primary channel node and neighbourhood
+- Green nodes indicate the primary channel(s) node and neighbourhood
 - Blue nodes indicate all channels that have been *fully* parsed
 - Red nodes indicate channel nodes that have been partially parsed, usually by running into limits
 
@@ -40,7 +40,7 @@ You will need to configure the `config.ini` accordingly.
 
 use_images: `true` if you want nodes to use profile pictures. `false` for coloured dots.
 
-primary_channel: `channel_name` for your primary channel
+primary_channel: `channel_name` for your primary channel(s). Can be a comma separated list of multiple channels to mark as primaries
 
 blacklisted_users: `twitchname_1,twitchname_2` comma separated list of channels names to ignore in the network generation
 
@@ -70,4 +70,6 @@ client_secret: `you_dev_app_client_secret`
 - It's missing collabs I did recently!
   - This can only grab from users mentioned in twitch vod titles with an `@`. Additionally, Twitch saves this information of your vod title *the moment* you go live. If you edit it in during stream, it will not work as expected. Set up your titles before going live for best results.
 - I have a bunch of red nodes!
-  - Red nodes mean you hit limits of either users or depth or other during processing. You can expand the values in the config at cost of processing time and load time. 
+  - Red nodes mean you hit limits of either users or depth or other during processing. You can expand the values in the config at cost of processing time and load time.
+- It's slow!
+  - With high depth and especially high user limits, and also with multiple primary channels, it will be slow to both build the connections, and to render the HTML each time. This is expected.  
