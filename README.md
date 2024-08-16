@@ -26,6 +26,17 @@ Once you have your config setup, run `main.py` and when it is done (it will log 
 
 The html file will only work if the `lib` folder is present!
 
+> But I don't want to run NERD code >:(
+
+In that case, you can download a portable executable of this program.
+
+Click on the [latest action here](https://github.com/WolfwithSword/TwitchCollabNetwork/actions/workflows/build.yml) and download the latest build for your operating system.
+
+Extract the zip to its own folder and make sure it has the executable, templates folder and config.ini. 
+
+Configure the config.ini as per below and you're good to go. I do not have this program versioned so uh, yeah, update whenever you feel like it.
+
+
 
 # Setup
 
