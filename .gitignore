@@ -1,7 +1,7 @@
 output.html
 lib/
 .idea/
-.zip
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
