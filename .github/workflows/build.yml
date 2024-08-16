@@ -39,7 +39,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build with pyinstaller
-        run: pyinstaller --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}/ --name=twitchcollabnetwork-${{ matrix.os }} main.py
+        run: pyinstaller --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}/ --collect-data pyvis --name=twitchcollabnetwork-${{ matrix.os }} main.py
 
       - name: Copy Resources
         run: mkdir dist/twitchcollabnetwork/${{ matrix.os }}/templates && cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}/templates/
