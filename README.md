@@ -24,7 +24,9 @@ Due to time it takes to fetch data and parse, when this is single-threaded it sh
 
 No errors from Twitch API are handled, or rather, only config input errors are handled. Good luck.
 
-Once you have your config setup, run `main.py` and when it is done (it will log depth progress), a file called `output.html` will be created in the same directory. Open this in a web browser to view the Collab Network.
+Once you have your config setup, run `main.py` and when it is done (it will log depth progress), a file called `output.html` and folder `lib` will be created in the same directory. Open this in a web browser to view the Collab Network.
+
+The html file will only work if the `lib` folder is present!
 
 
 # Setup
@@ -73,3 +75,5 @@ client_secret: `you_dev_app_client_secret`
   - Red nodes mean you hit limits of either users or depth or other during processing. You can expand the values in the config at cost of processing time and load time.
 - It's slow!
   - With high depth and especially high user limits, and also with multiple primary channels, it will be slow to both build the connections, and to render the HTML each time. This is expected.  
+- Stuck on 0% when I open the HTML file!
+  - Make sure the `lib` folder is in the same directory as it! 
