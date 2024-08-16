@@ -9,8 +9,6 @@ This program is still quite experimental and is mainly a proof-of-concept as it 
 
 **TODO**: Images
 
-**Long term goal**: Webhosted & run in browser. Maybe optimize it for multithreading.
-
 # Information
 
 - Green nodes indicate the primary channel(s) node and neighbourhood
@@ -44,7 +42,7 @@ use_images: `true` if you want nodes to use profile pictures. `false` for colour
 
 primary_channel: `channel_name` for your primary channel(s). Can be a comma separated list of multiple channels to mark as primaries
 
-blacklisted_users: `twitchname_1,twitchname_2` comma separated list of channels names to ignore in the network generation
+blacklisted_users: `twitchname_1,twitchname_2` comma separated list of channels names to ignore in the network generation. Sponsor/Corporate accounts are a good option here as it will help cut down on users!
 
 
 #### [DATA]
@@ -76,4 +74,17 @@ client_secret: `you_dev_app_client_secret`
 - It's slow!
   - With high depth and especially high user limits, and also with multiple primary channels, it will be slow to both build the connections, and to render the HTML each time. This is expected.  
 - Stuck on 0% when I open the HTML file!
-  - Make sure the `lib` folder is in the same directory as it! 
+  - Make sure the `lib` folder is in the same directory as it!
+
+# Notice
+
+
+Although it would be nice to have this run in-browser with your own twitch auth, I think I prefer having this be a local-only program.
+
+Reasoning is, it can be used to "measure" people and do speculative connections if anyone had access to it. Leaving it to be just a local/personal-use only program reduces that risk significantly.
+
+With that in mind, please have fun using this tool and do not go after any streamer based on information from this tool. Keep in mind, this tool *only* works off of mentioned users in vod titles (that were set before pressing go-live), so it does not actually cover 100% of collabs.
+
+Also, the license is open to derive this work for your own means, just don't commercialize it, harass anyone with it or a derivative, and if you do a derivative work, keep in mind my concern over having it web-hosted with live data. The intended use of this program is more of a "hey I wonder what it looks like right now" and move on kind of deal.
+
+If you have any questions about well, anything, you can contact me on discord at `@wolfwithsword`, or on Twitter `@_WolfwithSword`, or make a GH issue.

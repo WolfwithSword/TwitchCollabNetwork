@@ -44,7 +44,7 @@ if not CLIENT_ID or not CLIENT_SECRET:
 
 BLACKLISTED = config.get(section='DISPLAY', option='blacklisted_users', fallback="").lower().split(',')
 if BLACKLISTED:
-    BLACKLISTED = map(str.strip, BLACKLISTED)
+    BLACKLISTED = list(map(str.strip, BLACKLISTED))
 
 
 class Streamer:
