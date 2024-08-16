@@ -42,7 +42,7 @@ jobs:
         run: pyinstaller --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}/ --name=twitchcollabnetwork-${{ matrix.os }} main.py
 
       - name: Copy Resources
-        run: cp templates/ dist/twitchcollabnetwork/${{ matrix.os }}/templates
+        run: mkdir dist/twitchcollabnetwork/${{ matrix.os }}/templates && cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}/templates/
 
       - name: Copy Config
         run: cp config.ini dist/twitchcollabnetwork/${{ matrix.os }}/config.ini
