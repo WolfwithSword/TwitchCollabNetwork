@@ -31,10 +31,11 @@ The html file will only work if the `lib` folder is present!
 In that case, you can download a portable executable of this program.
 
 Click on the [latest action here](https://github.com/WolfwithSword/TwitchCollabNetwork/actions/workflows/build.yml) and download the latest build for your operating system.
+Check that the tag/branch is "main" for latest/nightly. Alternatively, check on the right side of the screen for versioned releases!
 
 Extract the zip to its own folder and make sure it has the executable, templates folder and config.ini. 
 
-Configure the config.ini as per below and you're good to go. I do not have this program versioned so uh, yeah, update whenever you feel like it.
+Configure the config.ini as per below and you're good to go. As for version updating, update whenever you feel like it by downloading a new portable version.
 
 
 
