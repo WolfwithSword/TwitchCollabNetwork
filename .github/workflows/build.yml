@@ -51,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: twitchcollabnetwork-${{ matrix.os }}
-          path: dist/twitchcollabnetwork/${{ matrix.os }}/twitchcollabnetwork-${{ matrix.os }}*
+          path: dist/twitchcollabnetwork/${{ matrix.os }}/
           if-no-files-found: error
