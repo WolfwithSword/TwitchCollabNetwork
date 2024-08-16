@@ -11,18 +11,18 @@ defaults:
     shell: bash
 
 jobs:
-  Build:
+  build:
     name: Build release binaries
 
     strategy:
       fail-fast: false
       matrix:
         os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+          - macos
+          - ubuntu
+          - windows
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
 
     steps:
       - name: Checkout
@@ -39,17 +39,28 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build with pyinstaller
-        run: pyinstaller --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}/ --collect-data pyvis --name=twitchcollabnetwork-${{ matrix.os }} main.py
+        run: pyinstaller --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/ --collect-data pyvis --name=twitchcollabnetwork-${{ matrix.os }}-${{github.ref_name}} main.py
 
       - name: Copy Resources
-        run: mkdir dist/twitchcollabnetwork/${{ matrix.os }}/templates && cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}/templates/
+        run: mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates && cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates/
 
       - name: Copy Config
-        run: cp config.ini dist/twitchcollabnetwork/${{ matrix.os }}/config.ini
+        run: cp config.ini dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/config.ini
 
-      - name: Deploy artifacts
+      - name: Deploy Artifacts
         uses: actions/upload-artifact@v4
+        if: true && !startsWith(github.ref, 'refs/tags/')
         with:
-          name: twitchcollabnetwork-${{ matrix.os }}
-          path: dist/twitchcollabnetwork/${{ matrix.os }}/
+          name: twitchcollabnetwork-${{matrix.os}}-latest
+          path: dist/twitchcollabnetwork/${{matrix.os}}-${{github.ref_name}}/
           if-no-files-found: error
+
+      - name: Release Rename
+        if: startsWith(github.ref, 'refs/tags/')
+        run: zip -r twitchcollabnetwork-${{matrix.os}}-${{github.ref_name}}.zip dist/twitchcollabnetwork/${{matrix.os}}-${{github.ref_name}}
+
+      - name: Release Artifacts
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: twitchcollabnetwork-${{matrix.os}}-${{github.ref_name}}.zip
