@@ -192,7 +192,7 @@ async def find_connections_from_videos(twitch: Twitch, videos: list[Video], user
         if names := re.findall('(@\w+)', v.title):
             for name in names:
                 n = name.replace("@", "").lower()
-                if n in BLACKLISTED:
+                if n in BLACKLISTED or len(n) < 4:
                     continue
                 if n not in users:
                     u = await get_user_by_name(twitch=twitch, username=n)
@@ -216,7 +216,11 @@ async def find_connections_from_videos(twitch: Twitch, videos: list[Video], user
 
 async def get_user_by_name(twitch: Twitch, username: str):
     # TODO: possibly optimize to fetch multiple per depth level at once
-    user = await first(twitch.get_users(logins=[username]))
+    try:
+        user = await first(twitch.get_users(logins=[username]))
+    except Exception as e:
+        print(f"Exception with username {username}, {e}")
+        user = None
     if user and user.display_name.lower() == username.lower():
         return user
     return None
@@ -226,7 +230,7 @@ async def get_videos(twitch: Twitch, user: TwitchUser):
     videos = []
     async for v in twitch.get_videos(user_id=user.id, first=MAX_VOD_DEPTH,
                                      sort=SortMethod.TIME, video_type=VideoType.ARCHIVE):
-        if "@" in v.title:
+        if v and v.title and "@" in v.title:
             videos.append(v)
     return videos
 
