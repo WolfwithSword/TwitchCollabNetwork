@@ -5,6 +5,12 @@ on:
  push:
    tags:
      - "v*.*.*"
+   paths:
+     - '.github/workflows/**'
+     - 'templates/**'
+     - 'main.py'
+     - 'config.ini'
+     - 'requirements.txt'
    branches:
      - main
  
