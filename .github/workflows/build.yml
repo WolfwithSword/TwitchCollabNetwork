@@ -3,7 +3,7 @@ name: Build
 on:
  workflow_dispatch:
  schedule:
-  - cron: "30 1 15 * *"
+  - cron: "30 1 1,15 * *"
  push:
    tags:
      - "v*.*.*"
