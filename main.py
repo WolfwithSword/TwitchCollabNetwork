@@ -192,7 +192,7 @@ async def find_connections_from_videos(twitch: Twitch, videos: list[Video], user
         if names := re.findall('(@\w+)', v.title):
             for name in names:
                 n = name.replace("@", "").lower()
-                if n in BLACKLISTED or len(n) < 4:
+                if not (4 <= len(n) <= 25) or n in BLACKLISTED:
                     continue
                 if n not in users:
                     u = await get_user_by_name(twitch=twitch, username=n)
