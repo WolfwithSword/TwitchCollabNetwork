@@ -1,4 +1,7 @@
 # Twitch Collab Network
+
+<img src="https://github.com/WolfwithSword/TwitchCollabNetwork/blob/88a91f741a224cb82ca3ddaa1620d86205bd6f7e/images/logo.png" width="192px" height="192px">
+
 Visualize the Twitch Collab Network between various streamers.
 
 This application takes in a primary channel(s) to start with and will scan all available VODs (not highlights or clips) for tagged users.
@@ -7,7 +10,7 @@ Any user tagged in a VOD title will have their VODs scanned and the process repe
 
 This program is still quite experimental and is mainly a proof-of-concept as it is now.
 
-**TODO**: Image Examples
+<img src="https://github.com/WolfwithSword/TwitchCollabNetwork/blob/88a91f741a224cb82ca3ddaa1620d86205bd6f7e/images/example.png" width="440px" height="318px">
 
 # Information
 
