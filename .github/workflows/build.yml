@@ -49,7 +49,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build with pyinstaller
-        run: pyinstaller --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/ --collect-data pyvis --name=twitchcollabnetwork-${{github.ref_name}} main.py
+        run: pyinstaller --icon=images/logo.ico --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/ --collect-data pyvis --name=twitchcollabnetwork-${{github.ref_name}} main.py
 
       - name: Copy Resources
         run: mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates && cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates/
