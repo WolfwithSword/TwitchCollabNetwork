@@ -78,6 +78,12 @@ client_id: `your_dev_app_client_id`
 
 client_secret: `you_dev_app_client_secret`
 
+#### [CONCURRENCY]
+
+enabled: `true/false` enable parallel processing concurrency
+
+max_concurrency: `12` max number of concurrent processes to run. Recommend 5-20. If you hit rate-limiting from twitch API, it will pause until the rate opens back up.
+
 # FAQ
 
 - It Crashed!

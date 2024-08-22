@@ -10,7 +10,7 @@ on:
    paths:
      - '.github/workflows/**'
      - 'templates/**'
-     - 'main.py'
+     - '*.py'
      - 'config.ini'
      - 'requirements.txt'
    branches:
