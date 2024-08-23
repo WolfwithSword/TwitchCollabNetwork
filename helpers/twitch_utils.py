@@ -10,12 +10,12 @@ from data.streamer_connection import StreamerConnection
 from helpers.config import TCNConfig
 
 
-class TwitchUtils():
+class TwitchUtils:
 
     def __init__(self, config: TCNConfig, twitch: Twitch):
         self.logger = logging.getLogger(__name__)
         self.config: TCNConfig = config
-        self.twitch:Twitch = twitch
+        self.twitch: Twitch = twitch
         self.blacklisted_channelnames = self.config.blacklisted_channelnames
 
     async def init_primary_user(self, username: str, users: dict):
@@ -36,7 +36,7 @@ class TwitchUtils():
     async def get_videos(self, user: TwitchUser, vod_depth: int):
         videos = []
         async for v in self.twitch.get_videos(user_id=user.id, first=vod_depth,
-                                         sort=SortMethod.TIME, video_type=VideoType.ARCHIVE):
+                                              sort=SortMethod.TIME, video_type=VideoType.ARCHIVE):
             if v and v.title and "@" in v.title:
                 videos.append(v)
         return videos
