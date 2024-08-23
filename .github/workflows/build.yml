@@ -10,9 +10,12 @@ on:
    paths:
      - '.github/workflows/**'
      - 'templates/**'
-     - '*.py'
+     - 'main.py'
+     - 'data/**'
+     - 'helpers/**'
      - 'config.ini'
      - 'requirements.txt'
+     - 'images/logo.ico'
    branches:
      - main
  
