@@ -123,6 +123,7 @@ async def twitch_run():
     logger.info("Completed in {:.2f} seconds".format(time_since(start_time=start_time)))
 
     if twitch_utils.cache:
+        twitch_utils.cache.expire()
         twitch_utils.cache.close()
 
 
