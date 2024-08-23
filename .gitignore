@@ -4,6 +4,7 @@ lib/
 *.zip
 .tcn-cache/
 *.db
+test.config.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
