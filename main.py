@@ -18,6 +18,10 @@ from helpers.config import TCNConfig
 from helpers.twitch_utils import TwitchUtils
 from helpers.utils import chunkify, time_since
 
+#########
+# Setup #
+#########
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tcn-main")
 
@@ -65,9 +69,12 @@ if args.output_file:
     OUTPUT_FILE = args.output_file
     logger.info(f"Output will go to: {OUTPUT_FILE}")
 
+################
+# End of Setup #
+################
 
 # Each user lookup is always two api requests. First is for user check, second is for video archives check.
-# So N=500 users, means 1000 API requests
+# So N=500 users, means 1000 API requests. Mitigated if using disk cache.
 
 
 async def twitch_run():
@@ -141,7 +148,9 @@ async def twitch_run():
     net = Network(notebook=False, height="1500px", width="100%",
                   bgcolor="#222222",
                   font_color="white",
-                  heading=f"Twitch Collab Network: {','.join(config.primary_channelnames)}<br>{datetime.today().strftime('%Y-%m-%d')}<br>Depth: {depth}, Connections: {len(users)}",
+                  heading=f"Twitch Collab Network: {','.join(config.primary_channelnames)}"
+                          f"<br>{datetime.today().strftime('%Y-%m-%d')}"
+                          f"<br>Depth: {depth}, Connections: {len(users)}",
                   select_menu=False, filter_menu=True, neighborhood_highlight=True)
     net.from_nx(G)
     options = '{"nodes": {"borderWidth": 5}}'
