@@ -1,6 +1,9 @@
+import os
+import argparse
+import sys
+
 import asyncio
 import time
-import os
 
 from datetime import datetime
 import logging
@@ -17,9 +20,26 @@ from helpers.utils import chunkify, time_since
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tcn-main")
 
-config = TCNConfig()
 cwd = os.getcwd()
 config_path = os.path.join(cwd, 'config.ini')
+
+argv = sys.argv
+conf_parser = argparse.ArgumentParser(
+        description=__doc__,  # -h/--help
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False
+        )
+conf_parser.add_argument("-c", "--conf_file", help="Specify config file", metavar="FILE")
+args, remaining_argv = conf_parser.parse_known_args()
+
+if args.conf_file:
+    if os.path.isfile(args.conf_file):
+        logger.info(f"Using config file: {args.conf_file}")
+        config_path = args.conf_file
+    else:
+        logger.warning(f"Could not use config path `{args.conf_file}`. Using default file and values")
+
+config = TCNConfig()
 config.setup(path=config_path)
 
 if not config.primary_channelnames:
