@@ -28,6 +28,7 @@ logger = logging.getLogger("tcn-main")
 cwd = os.getcwd()
 config_path = os.path.join(cwd, 'config.ini')
 OUTPUT_FILE = "output.html"
+custom_output = False
 
 argv = sys.argv
 conf_parser = argparse.ArgumentParser(
@@ -68,6 +69,7 @@ if args.output_file:
         quit()
     OUTPUT_FILE = args.output_file
     logger.info(f"Output will go to: {OUTPUT_FILE}")
+    custom_output = True
 
 ################
 # End of Setup #
@@ -160,11 +162,12 @@ async def twitch_run():
     net.set_template_dir(os.path.join(cwd, 'templates'), 'template.html')
 
     output_dir = os.path.dirname(OUTPUT_FILE)
-    if not os.path.exists(output_dir):
+
+    if custom_output and not os.path.exists(output_dir):
         os.makedirs(output_dir)
     net.write_html(name=OUTPUT_FILE, notebook=False, local=True, open_browser=False)
 
-    if not os.path.exists(os.path.join(output_dir, 'lib')) and os.path.exists('lib'):
+    if custom_output and not os.path.exists(os.path.join(output_dir, 'lib')) and os.path.exists('lib'):
         shutil.copytree("lib", os.path.join(output_dir, "lib"))
 
     logger.info("Completed in {:.2f} seconds".format(time_since(start_time=start_time)))
