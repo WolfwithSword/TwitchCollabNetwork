@@ -42,6 +42,10 @@ if args.conf_file:
     else:
         logger.warning(f"Could not use config path `{args.conf_file}`. Using default file and values")
 
+if not os.path.isfile(config_path):
+    logger.error("No valid config file was found. Please setup a valid config file")
+    quit()
+
 config = TCNConfig()
 config.setup(path=config_path)
 
