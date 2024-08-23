@@ -1,6 +1,10 @@
+import os
+import argparse
+import sys
+import shutil
+
 import asyncio
 import time
-import os
 
 from datetime import datetime
 import logging
@@ -14,12 +18,39 @@ from helpers.config import TCNConfig
 from helpers.twitch_utils import TwitchUtils
 from helpers.utils import chunkify, time_since
 
+#########
+# Setup #
+#########
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tcn-main")
 
-config = TCNConfig()
 cwd = os.getcwd()
 config_path = os.path.join(cwd, 'config.ini')
+OUTPUT_FILE = "output.html"
+
+argv = sys.argv
+conf_parser = argparse.ArgumentParser(
+    description=__doc__,  # -h/--help
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    add_help=False
+)
+conf_parser.add_argument("-c", "--conf_file", help="Specify config file", metavar="FILE")
+conf_parser.add_argument('-o', '--output_file', help="Specify the output file", metavar="FILE")
+args, remaining_argv = conf_parser.parse_known_args()
+
+if args.conf_file:
+    if os.path.isfile(args.conf_file):
+        logger.info(f"Using config file: {args.conf_file}")
+        config_path = args.conf_file
+    else:
+        logger.warning(f"Could not use config path `{args.conf_file}`. Using default file and values")
+
+if not os.path.isfile(config_path):
+    logger.error("No valid config file was found. Please setup a valid config file")
+    quit()
+
+config = TCNConfig()
 config.setup(path=config_path)
 
 if not config.primary_channelnames:
@@ -31,15 +62,22 @@ if not CLIENT_ID or not CLIENT_SECRET:
     logger.error("Please input your twitch client_id and client_secret")
     quit()
 
-BLACKLISTED = config.blacklisted_channelnames
+if args.output_file:
+    if not str(args.output_file).endswith(".html"):
+        logger.error(f"Custom output file `{args.output_file}` is invalid. Must be an HTML file")
+        quit()
+    OUTPUT_FILE = args.output_file
+    logger.info(f"Output will go to: {OUTPUT_FILE}")
 
+################
+# End of Setup #
+################
 
 # Each user lookup is always two api requests. First is for user check, second is for video archives check.
-# So N=500 users, means 1000 API requests
+# So N=500 users, means 1000 API requests. Mitigated if using disk cache.
 
 
 async def twitch_run():
-
     start_time = time.time()
     twitch = await Twitch(app_id=CLIENT_ID, app_secret=CLIENT_SECRET)
     cache_dir = os.path.join(cwd, '.tcn-cache/')
@@ -110,7 +148,9 @@ async def twitch_run():
     net = Network(notebook=False, height="1500px", width="100%",
                   bgcolor="#222222",
                   font_color="white",
-                  heading=f"Twitch Collab Network: {','.join(config.primary_channelnames)}<br>{datetime.today().strftime('%Y-%m-%d')}<br>Depth: {depth}, Connections: {len(users)}",
+                  heading=f"Twitch Collab Network: {','.join(config.primary_channelnames)}"
+                          f"<br>{datetime.today().strftime('%Y-%m-%d')}"
+                          f"<br>Depth: {depth}, Connections: {len(users)}",
                   select_menu=False, filter_menu=True, neighborhood_highlight=True)
     net.from_nx(G)
     options = '{"nodes": {"borderWidth": 5}}'
@@ -118,9 +158,17 @@ async def twitch_run():
     net.set_options(options)
 
     net.set_template_dir(os.path.join(cwd, 'templates'), 'template.html')
-    net.write_html(name="output.html", notebook=False, local=True, open_browser=False)
+
+    output_dir = os.path.dirname(OUTPUT_FILE)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    net.write_html(name=OUTPUT_FILE, notebook=False, local=True, open_browser=False)
+
+    if not os.path.exists(os.path.join(output_dir, 'lib')) and os.path.exists('lib'):
+        shutil.copytree("lib", os.path.join(output_dir, "lib"))
 
     logger.info("Completed in {:.2f} seconds".format(time_since(start_time=start_time)))
+    logger.info(f"Output: {os.path.abspath(OUTPUT_FILE)}")
 
     if twitch_utils.cache:
         twitch_utils.cache.expire()

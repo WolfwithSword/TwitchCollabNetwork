@@ -96,6 +96,20 @@ user_expiry_s: `3600` number of seconds to keep user API results from twitch bef
 
 vodlist_expiry_s: `600` number of seconds to keep list of user's vods with tagged users from twitch API before expiring. Can be long, but if a new public vod goes up, it won't be picked up until this expires
 
+### CLI Parameters
+
+- **-c \<filepath>** | **--conf_file \<filepath>**
+  - Accepts a filepath for a config file to use instead of the default `config.ini` found next to the program
+- **-o \<filepath>** | **--output_file \<filepath**
+  - A filepath to output the generated html to. Must end with '.html'.
+  - Can be in a different directory and will automatically copy the lib folder to it if not present. 
+
+*Examples*
+
+`./twitchcollabnetwork.exe -c configs/streamer1.config.ini -o output/streamer1/output.html`
+
+`./twitchcollabnetwork.exe -c configs/streamer1.config.ini -o output/streamer1.html`
+
 # FAQ
 
 - It Crashed!
