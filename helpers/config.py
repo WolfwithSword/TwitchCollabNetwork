@@ -11,6 +11,8 @@ class TCNConfig(configparser.ConfigParser):
         self.max_children: int = 75
         self.concurrency: bool = False
         self.max_concurrency: int = 1
+        self.cache_user_expiry: int = 1 * 60 * 60  # 1 hour
+        self.cache_vodlist_expiry: int = 1 * 60 * 10  # 10 minutes
 
     def setup(self, path: str):
         self.read(path)
@@ -36,6 +38,9 @@ class TCNConfig(configparser.ConfigParser):
         self.max_concurrency = self.getint(section='CONCURRENCY', option='max_concurrency', fallback=2)
         if not self.concurrency or self.max_concurrency < 0:
             self.max_concurrency = 1
+
+        self.cache_user_expiry = self.getint(section="CACHE", option="user_expiry_s", fallback=1 * 60 * 60)
+        self.cache_vodlist_expiry = self.getint(section="CACHE", option="vodlist_expiry_s", fallback=1 * 60 * 10)
 
     @property
     def primary_channelnames(self) -> list:
@@ -66,3 +71,7 @@ class TCNConfig(configparser.ConfigParser):
             blacklisted = list(map(str.strip, blacklisted))
             return blacklisted
         return []
+
+    @property
+    def cache_enabled(self) -> bool:
+        return self.getboolean(section='CACHE', option='enabled', fallback=False)

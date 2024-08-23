@@ -23,12 +23,12 @@ config_path = os.path.join(cwd, 'config.ini')
 config.setup(path=config_path)
 
 if not config.primary_channelnames:
-    logger.warning("Please specify a channel")
+    logger.error("Please specify a channel")
     quit()
 
 CLIENT_ID, CLIENT_SECRET = config.twitch_auth
 if not CLIENT_ID or not CLIENT_SECRET:
-    logger.warning("Please input your twitch client_id and client_secret")
+    logger.error("Please input your twitch client_id and client_secret")
     quit()
 
 BLACKLISTED = config.blacklisted_channelnames
@@ -42,7 +42,8 @@ async def twitch_run():
 
     start_time = time.time()
     twitch = await Twitch(app_id=CLIENT_ID, app_secret=CLIENT_SECRET)
-    twitch_utils = TwitchUtils(config=config, twitch=twitch)
+    cache_dir = os.path.join(cwd, '.tcn-cache/')
+    twitch_utils = TwitchUtils(config=config, twitch=twitch, cache_dir=cache_dir)
     users = dict()
     depth = 1
 
@@ -119,7 +120,10 @@ async def twitch_run():
     net.set_template_dir(os.path.join(cwd, 'templates'), 'template.html')
     net.write_html(name="output.html", notebook=False, local=True, open_browser=False)
 
-    logger.info("\nCompleted in {:.2f} seconds".format(time_since(start_time=start_time)))
+    logger.info("Completed in {:.2f} seconds".format(time_since(start_time=start_time)))
+
+    if twitch_utils.cache:
+        twitch_utils.cache.close()
 
 
 def all_done(users: dict, depth: int):

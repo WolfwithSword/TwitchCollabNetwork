@@ -9,14 +9,24 @@ from twitchAPI.type import SortMethod, VideoType
 from data.streamer_connection import StreamerConnection
 from helpers.config import TCNConfig
 
+from diskcache import Cache
+
 
 class TwitchUtils:
 
-    def __init__(self, config: TCNConfig, twitch: Twitch):
+    def __init__(self, config: TCNConfig, twitch: Twitch, cache_dir: str = ""):
         self.logger = logging.getLogger(__name__)
         self.config: TCNConfig = config
         self.twitch: Twitch = twitch
         self.blacklisted_channelnames = self.config.blacklisted_channelnames
+
+        if self.config.cache_enabled:
+            if not cache_dir:
+                self.cache = Cache()
+            else:
+                self.cache = Cache(directory=cache_dir)
+        else:
+            self.cache = None
 
     async def init_primary_user(self, username: str, users: dict):
         if username.strip() in self.blacklisted_channelnames:
@@ -37,20 +47,37 @@ class TwitchUtils:
         await self.find_connections_from_videos(videos, user, users)
 
     async def get_videos(self, user: TwitchUser, vod_depth: int):
+        key = f"{user.display_name.lower()}.vods"
+
+        if self.cache:
+            videos = self.cache.get(key=key, default=[])
+            if videos:
+                return videos
+
         videos = []
         async for v in self.twitch.get_videos(user_id=user.id, first=vod_depth,
                                               sort=SortMethod.TIME, video_type=VideoType.ARCHIVE):
             if v and v.title and "@" in v.title:
                 videos.append(v)
+        if self.cache:
+            self.cache.set(key=key, expire=self.config.cache_vodlist_expiry, value=videos)
         return videos
 
     async def get_user_by_name(self, username: str):
+        key = f"{username}.user"
+        if self.cache:
+            user = self.cache.get(key=key, default=None)
+            if user:
+                return user
+
         try:
             user = await first(self.twitch.get_users(logins=[username]))
         except Exception as e:
             self.logger.warning(f"Exception with username {username}, {e}")
             user = None
         if user and user.display_name.lower() == username.lower():
+            if self.cache:
+                self.cache.set(key=key, expire=self.config.cache_user_expiry, value=user)
             return user
         return None
 

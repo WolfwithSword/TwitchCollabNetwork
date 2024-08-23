@@ -80,9 +80,21 @@ client_secret: `you_dev_app_client_secret`
 
 #### [CONCURRENCY]
 
+This program supports parallelism / concurrency for user processing either in API requests or cache fetching.
+
 enabled: `true/false` enable parallel processing concurrency
 
 max_concurrency: `12` max number of concurrent processes to run. Recommend 5-20. If you hit rate-limiting from twitch API, it will pause until the rate opens back up.
+
+#### [CACHE]
+
+This program supports file/disk based caching. Since this program is used to generate an output after running and is not run as a live service, a disk based cache is more useful than in-memory cache, as now API results can persist in between sessions.
+
+enabled: `true/false` enable local disk caching for twitch API results.
+
+user_expiry_s: `3600` number of seconds to keep user API results from twitch before expiring. This can be a higher number without affecting much.
+
+vodlist_expiry_s: `600` number of seconds to keep list of user's vods with tagged users from twitch API before expiring. Can be long, but if a new public vod goes up, it won't be picked up until this expires
 
 # FAQ
 
