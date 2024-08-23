@@ -49,7 +49,7 @@ class TwitchUtils:
     async def get_videos(self, user: TwitchUser, vod_depth: int):
         key = f"{user.display_name.lower()}.vods"
 
-        if self.cache:
+        if self.cache is not None:
             videos = self.cache.get(key=key, default=[])
             if videos:
                 return videos
@@ -59,13 +59,13 @@ class TwitchUtils:
                                               sort=SortMethod.TIME, video_type=VideoType.ARCHIVE):
             if v and v.title and "@" in v.title:
                 videos.append(v)
-        if self.cache:
+        if self.cache is not None:
             self.cache.set(key=key, expire=self.config.cache_vodlist_expiry, value=videos)
         return videos
 
     async def get_user_by_name(self, username: str):
         key = f"{username}.user"
-        if self.cache:
+        if self.cache is not None:
             user = self.cache.get(key=key, default=None)
             if user:
                 return user
@@ -76,7 +76,7 @@ class TwitchUtils:
             self.logger.warning(f"Exception with username {username}, {e}")
             user = None
         if user and user.display_name.lower() == username.lower():
-            if self.cache:
+            if self.cache is not None:
                 self.cache.set(key=key, expire=self.config.cache_user_expiry, value=user)
             return user
         return None
