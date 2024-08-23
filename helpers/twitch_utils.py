@@ -19,7 +19,10 @@ class TwitchUtils:
         self.blacklisted_channelnames = self.config.blacklisted_channelnames
 
     async def init_primary_user(self, username: str, users: dict):
-        primary_user = await self.get_user_by_name(username)
+        if username.strip() in self.blacklisted_channelnames:
+            return
+
+        primary_user = await self.get_user_by_name(username.strip())
         if not primary_user:
             return
 
@@ -60,9 +63,9 @@ class TwitchUtils:
             if user.size >= self.config.max_children:
                 user.color = 'red'
                 break
-            if names := re.findall('(@\w+)', v.title):
+            if names := re.findall(r'(@\w+)', v.title):
                 for name in names:
-                    n = name.replace("@", "").lower()
+                    n = name.replace("@", "").lower().strip()
                     if not (4 <= len(n) <= 25) or n in self.blacklisted_channelnames:
                         continue
                     if n not in users:
@@ -72,7 +75,7 @@ class TwitchUtils:
                             user.add_child(child)
                             child.add_child(user)  # Bidirectional enforcement
                             users[child.name] = child
-                    elif n not in [x.name for x in user.children]:
+                    elif n not in [x.name.strip() for x in user.children]:
                         user.add_child(users[n])
                         if user not in users[n].children:  # Bidirectional enforcement
                             users[n].add_child(user)  # Bidirectional enforcement

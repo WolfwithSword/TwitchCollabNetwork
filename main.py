@@ -56,7 +56,7 @@ async def twitch_run():
                 await asyncio.gather(*chunked_users)
     else:
         for primary_username in config.primary_channelnames:
-            await twitch_utils.init_primary_user(primary_username, users)
+            await twitch_utils.init_primary_user(username=primary_username, users=users)
 
     if len(users) == 0:
         logger.error("No valid primary channels were found. Please reconfigure the primary_channel(s)")
@@ -66,17 +66,17 @@ async def twitch_run():
 
     # Loop 'recursively' until we hit a limit
     while not all_done(users, depth):
-        non_processed_users = list([_u for _u in list(users) if not users[_u].processed])
+        non_processed_users = list([_u.strip() for _u in list(users) if not users[_u.strip()].processed])
         if config.concurrency and len(non_processed_users) > 1:
             chunks = list(chunkify(non_processed_users, config.max_concurrency))
             for chunk in chunks:
                 if chunk:
-                    chunked_users = [twitch_utils.scan_user(user=users[_u], users=users)
+                    chunked_users = [twitch_utils.scan_user(user=users[_u.strip()], users=users)
                                      for _u in chunk]
                     await asyncio.gather(*chunked_users)
         else:
             for user in non_processed_users:
-                await twitch_utils.scan_user(user=users[user], users=users)
+                await twitch_utils.scan_user(user=users[user.strip()], users=users)
         depth += 1
         progress_time = "{:.2f}".format(time_since(start_time=start_time))
         logger.info(f"At depth level {depth} with {len(users)} users. {progress_time}s...")
