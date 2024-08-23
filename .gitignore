@@ -5,6 +5,7 @@ lib/
 .tcn-cache/
 *.db
 test.config.ini
+output/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
