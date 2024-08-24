@@ -17,13 +17,12 @@ This program is still quite experimental and is mainly a proof-of-concept as it 
 - Green nodes indicate the primary channel(s) node and neighbourhood
 - Blue nodes indicate all channels that have been *fully* parsed
 - Red nodes indicate channel nodes that have been partially parsed, usually by running into limits
+- Size of node is dictated by number of connections
+- If configured, thickness of edges are dictated by number of collabs between two streamers
 
-You can drag around nodes and hover over them for some more details.
+You can drag around nodes and edges, and hover over them for some more details.
 
-Note: No handling for rate limiting is implemented yet as this is a POC.
-Due to time it takes to fetch data and parse, when this is single-threaded it should be fine without hitting rate limits as it is sequentially fetching data.
-
-No errors from Twitch API are handled, or rather, only config input errors are handled. Good luck.
+Not all errors from Twitch API are handled. Good luck.
 
 Once you have your config setup, run `main.py` and when it is done (it will log depth progress), a file called `output.html` and folder `lib` will be created in the same directory. Open this in a web browser to view the Collab Network.
 
@@ -33,13 +32,12 @@ The html file will only work if the `lib` folder is present!
 
 In that case, you can download a portable executable of this program.
 
-Click on the [latest action here](https://github.com/WolfwithSword/TwitchCollabNetwork/actions/workflows/build.yml?query=branch%3Amain+is%3Asuccess) and download the latest build for your operating system.
-Check that the tag/branch is "main" for latest/nightly. Alternatively, check on the right side of the screen for [versioned releases](https://github.com/WolfwithSword/TwitchCollabNetwork/releases/latest)!
+Check on the right side of the screen for [versioned releases](https://github.com/WolfwithSword/TwitchCollabNetwork/releases/latest)!
+Alternatively, click on the [latest action here](https://github.com/WolfwithSword/TwitchCollabNetwork/actions/workflows/build.yml?query=branch%3Amain+is%3Asuccess) for the latest dev/nightly release!
 
 Extract the zip to its own folder and make sure it has the executable, templates folder and config.ini. 
 
-Configure the config.ini as per below and you're good to go. As for version updating, update whenever you feel like it by downloading a new portable version.
-
+Configure the config.ini as per below and you're good to go. As for version updating, update whenever you feel like it by downloading a new portable version and overwrite the application and template folders. For config, migrate your config manually in case new settings were added.
 
 
 # Setup
@@ -49,52 +47,57 @@ Configure the config.ini as per below and you're good to go. As for version upda
 This was built using Python 3.10. See `requirements.txt` for dependencies
 
 ### Config
-You will need to configure the `config.ini` accordingly.
+You will need to configure the `config.ini` accordingly. Alternatively, you can make multiple and use the CLI parameters to run different configs.
+
 
 #### [DISPLAY]
 
-use_images: `true` if you want nodes to use profile pictures. `false` for coloured dots.
-
-primary_channel: `channel_name` for your primary channel(s). Can be a comma separated list of multiple channels to mark as primaries
-
-blacklisted_users: `twitchname_1,twitchname_2` comma separated list of channels names to ignore in the network generation. Sponsor/Corporate accounts are a good option here as it will help cut down on users!
+| Setting           |        Type/Default         | Description                                                                                                       |
+|-------------------|:---------------------------:|-------------------------------------------------------------------------------------------------------------------|
+| use_images        |      boolean (`true`)       | `true` for nodes to use profile pictures. <br/>`false` for coloured dots                                          |
+| primary_channel   | string(s) (comma-separated) | One or more channel names to use as primary starting channels                                                     |
+| blacklisted_users | string(s) (comma-separated) | Comma separated list of channels to ignore completely.<br/>Useful to add sponsor/corporate/company accounts here. |
+| weighted_edges    |      boolean (`false`)      | Whether or not to thicken lines/edges between users, based on number of times they've collaborated                |
 
 
 #### [DATA]
 
-max_depth: `7` Max number of outward channels to look at before stopping
+| Setting      | Type/Default | Description                                                                               |
+|--------------|:------------:|-------------------------------------------------------------------------------------------|
+| max_depth    |  int (`7`)   | Max number for depth of outward channels to look at before stopping                       |
+| max_users    | int (`500`)  | Max number of channels/users to look at before stopping                                   |
+| max_vods     | int (`100`)  | Max number of public vods on a channel to scan. Starts at latest first. Hard limit of 100 |
+| max_children |  int (`60`)  | Max number of children a node can have before it stops processing more for *that* node    |
 
-max_users: `500` Max number of channels/users to look at before stopping
-
-max_vods: `100` Max number of vods on a channel to scan through. Starts at most recent. Hard limit of 100.
-
-max_children: `60` Max number of children a node can have before it stops processing more on *that* node
 
 #### [TWITCH]
 
 See [Twitch Developer Docs](https://dev.twitch.tv/docs/api/get-started/) on how to get your id/secret
 
-client_id: `your_dev_app_client_id`
+| Setting       | Type/Default | Description                  |
+|---------------|:------------:|------------------------------|
+| client_id     |    string    | Twitch Dev App client id     |
+| client_secret |    string    | Twitch Dev App client secret |
 
-client_secret: `you_dev_app_client_secret`
 
 #### [CONCURRENCY]
 
 This program supports parallelism / concurrency for user processing either in API requests or cache fetching.
 
-enabled: `true/false` enable parallel processing concurrency
-
-max_concurrency: `12` max number of concurrent processes to run. Recommend 5-20. If you hit rate-limiting from twitch API, it will pause until the rate opens back up.
+| Setting         |   Type/Default   | Description                                                                                                                                      |
+|-----------------|:----------------:|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| enabled         | boolean (`true`) | Enable/Disable parallel processing for API calls to Twitch                                                                                       |
+| max_concurrency |    int (`12`)    | Max number of concurrent processes. Recommend 5-20.<br/>If you hit Twitch's rate limits, it will wait until your limit resets before continuing. |
 
 #### [CACHE]
 
 This program supports file/disk based caching. Since this program is used to generate an output after running and is not run as a live service, a disk based cache is more useful than in-memory cache, as now API results can persist in between sessions.
 
-enabled: `true/false` enable local disk caching for twitch API results.
-
-user_expiry_s: `3600` number of seconds to keep user API results from twitch before expiring. This can be a higher number without affecting much.
-
-vodlist_expiry_s: `600` number of seconds to keep list of user's vods with tagged users from twitch API before expiring. Can be long, but if a new public vod goes up, it won't be picked up until this expires
+| Setting          |   Type/Default   | Description                                                                                                                                                                                                  |
+|------------------|:----------------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| enabled          | boolean (`true`) | Enable/Disable local disk caching for Twitch API results                                                                                                                                                     |
+| user_expiry_s    |   int (`3600`)   | Number of Seconds to cache API results for Twitch Users.<br/>This is generally okay to have really high, as User data almost never changes.                                                                  |
+| vodlist_expiry_s |   int (`600`)    | Number of seconds to cache API results for Twitch Vod titles.<br/>Recommend not too long, as if a streamer goes live before this expires, it will not get the newest vod title until the expiry time lapses. |
 
 ### CLI Parameters
 

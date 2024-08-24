@@ -99,13 +99,16 @@ class TwitchUtils:
                         u = await self.get_user_by_name(username=n)
                         if u:
                             child = StreamerConnection(u)
-                            user.add_child(child)
-                            child.add_child(user)  # Bidirectional enforcement
+                            user.add_collab(child)
+                            child.add_collab(user, was_tagged=False)
                             users[child.name] = child
                     elif n not in [x.name.strip() for x in user.children]:
-                        user.add_child(users[n])
-                        if user not in users[n].children:  # Bidirectional enforcement
-                            users[n].add_child(user)  # Bidirectional enforcement
+                        user.add_collab(users[n])
+                        if user not in users[n].children:
+                            users[n].add_collab(user, was_tagged=False)
+                    elif n in users:
+                        # Just increment collab counter
+                        user.add_collab(users[n])
                     if len(users) >= self.config.max_connections:
                         break
                     if user.size >= self.config.max_children:
