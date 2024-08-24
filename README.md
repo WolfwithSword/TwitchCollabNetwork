@@ -106,6 +106,8 @@ This program supports file/disk based caching. Since this program is used to gen
 - **-o \<filepath>** | **--output_file \<filepath**
   - A filepath to output the generated html to. Must end with '.html'.
   - Can be in a different directory and will automatically copy the lib folder to it if not present. 
+- **-v | --version**
+  - Display the current version of TwitchCollabNetwork 
 
 *Examples*
 
