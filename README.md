@@ -59,6 +59,7 @@ primary_channel: `channel_name` for your primary channel(s). Can be a comma sepa
 
 blacklisted_users: `twitchname_1,twitchname_2` comma separated list of channels names to ignore in the network generation. Sponsor/Corporate accounts are a good option here as it will help cut down on users!
 
+weighted_edges: `true/false` whether to thicken lines/edges between users based on how many times they've collab'd
 
 #### [DATA]
 

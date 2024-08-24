@@ -75,3 +75,7 @@ class TCNConfig(configparser.ConfigParser):
     @property
     def cache_enabled(self) -> bool:
         return self.getboolean(section='CACHE', option='enabled', fallback=False)
+
+    @property
+    def weighted_edges(self) -> bool:
+        return self.getboolean(section='DISPLAY', option='weighted_edges', fallback=False)

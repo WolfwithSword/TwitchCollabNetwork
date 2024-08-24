@@ -142,10 +142,27 @@ async def twitch_run():
                    url=f"https://twitch.tv/{user.name}", channel_name=user.name, connections=len(user.children),
                    border=user.node_color)
 
+    weighted_edges = config.weighted_edges
     for u in users:
         user = users[u]
         for child in user.children:
-            G.add_edge(user.name, child.name)
+            if user.name == child.name:
+                title = (f"<b>{user.name}</b> tagged themselves {user.collab_counts.get(child.name, 0)} "
+                         f"time{'s' if user.collab_counts.get(child.name, 0) != 1 else ''}")
+                weight = 1
+            else:
+                user_tag_child_count = user.collab_counts.get(child.name, 0)
+                child_tag_user_count = child.collab_counts.get(user.name, 0)
+                title = (f"<b>{user.name}</b> tagged <b>{child.name}</b> {user_tag_child_count} "
+                         f"time{'s' if user_tag_child_count != 1 else ''}"
+                         f"<br><b>{child.name}</b> tagged <b>{user.name}</b> {child_tag_user_count} "
+                         f"time{'s' if child_tag_user_count != 1 else ''}")
+                weight = min(max(1,
+                                 max(user.collab_counts.get(child.name, 1), child.collab_counts.get(user.name, 1))
+                                 * 0.6), 10)
+            if not weighted_edges:
+                weight = 1
+            G.add_edge(user.name, child.name, title=title, weight=weight, parent=user.name, child=child.name)
 
     net = Network(notebook=False, height="1500px", width="100%",
                   bgcolor="#222222",
