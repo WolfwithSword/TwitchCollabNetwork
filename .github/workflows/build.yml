@@ -70,7 +70,11 @@ jobs:
         run: pyinstaller --icon=images/logo.ico --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/ --collect-data pyvis --name=twitchcollabnetwork main.py
 
       - name: Copy Resources
-        run: mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates && cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates/
+        run: |
+          mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates 
+          mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/updater
+          cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates/
+          cp updater/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/updater/
 
       - name: Copy Config
         run: cp config.ini dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/config.ini

@@ -6,6 +6,9 @@ lib/
 *.db
 test.config.ini
 output/
+updater/tmp/
+*.exe
+twitchcollabnetwork
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
