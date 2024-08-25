@@ -44,7 +44,7 @@ conf_parser.add_argument('-v', '--version', action='version', version=f'TwitchCo
 
 args, remaining_argv = conf_parser.parse_known_args()
 
-logger.info(f"TwitchCollabManager"
+logger.info(f"TwitchCollabNetwork"
             f"\nVersion: {__version__}"
             f"\nBy: WolfwithSword"
             f"\nhttps://github.com/WolfwithSword/TwitchCollabNetwork"
