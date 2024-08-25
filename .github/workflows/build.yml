@@ -51,11 +51,30 @@ jobs:
           python -m pip install --upgrade pip pyinstaller
           pip install -r requirements.txt
 
+      - name: Release Versioning
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "__version__='${{github.ref_name}}'" > _version.py
+
+      - name: Nightly Versioning
+        if: true && !startsWith(github.ref, 'refs/tags/')
+        run: |
+          echo "__version__='nightly-${{github.sha}}'" > _version.py
+
       - name: Build with pyinstaller
-        run: pyinstaller --icon=images/logo.ico --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/ --collect-data pyvis --name=twitchcollabnetwork-${{github.ref_name}} main.py
+        if: true && !startsWith(github.ref, 'refs/tags/')
+        run: pyinstaller --icon=images/logo.ico --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/ --collect-data pyvis --name=twitchcollabnetwork-nightly main.py
+
+      - name: Release Build with pyinstaller
+        if: startsWith(github.ref, 'refs/tags/')
+        run: pyinstaller --icon=images/logo.ico --onefile --distpath dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/ --collect-data pyvis --name=twitchcollabnetwork main.py
 
       - name: Copy Resources
-        run: mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates && cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates/
+        run: |
+          mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates 
+          mkdir dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/updater
+          cp templates/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/templates/
+          cp updater/* dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/updater/
 
       - name: Copy Config
         run: cp config.ini dist/twitchcollabnetwork/${{ matrix.os }}-${{github.ref_name}}/config.ini

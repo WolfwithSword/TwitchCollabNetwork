@@ -18,6 +18,8 @@ from helpers.config import TCNConfig
 from helpers.twitch_utils import TwitchUtils
 from helpers.utils import chunkify, time_since
 
+from _version import __version__
+
 #########
 # Setup #
 #########
@@ -38,7 +40,15 @@ conf_parser = argparse.ArgumentParser(
 )
 conf_parser.add_argument("-c", "--conf_file", help="Specify config file", metavar="FILE")
 conf_parser.add_argument('-o', '--output_file', help="Specify the output file", metavar="FILE")
+conf_parser.add_argument('-v', '--version', action='version', version=f'TwitchCollabNetwork Version: {__version__}')
+
 args, remaining_argv = conf_parser.parse_known_args()
+
+logger.info(f"TwitchCollabManager"
+            f"\nVersion: {__version__}"
+            f"\nBy: WolfwithSword"
+            f"\nhttps://github.com/WolfwithSword/TwitchCollabNetwork"
+            f"\n")
 
 if args.conf_file:
     if os.path.isfile(args.conf_file):
