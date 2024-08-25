@@ -1,3 +1,5 @@
+#!/bin/sh
+
 latest=$(curl -s https://api.github.com/repos/WolfwithSword/TwitchCollabNetwork/releases/latest | grep -i "tag_name" | awk -F '"' '{print $4}')
 current=$("../twitchcollabnetwork" -v | awk '{print $3}')
 
