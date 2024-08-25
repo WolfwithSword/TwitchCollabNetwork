@@ -37,7 +37,11 @@ Alternatively, click on the [latest action here](https://github.com/WolfwithSwor
 
 Extract the zip to its own folder and make sure it has the executable, templates folder and config.ini. 
 
-Configure the config.ini as per below and you're good to go. As for version updating, update whenever you feel like it by downloading a new portable version and overwrite the application and template folders. For config, migrate your config manually in case new settings were added.
+Configure the config.ini as per below and you're good to go.
+
+For updating, either download a new version from here when a new release is available (overwrite templates and updater folder, and executable. Do not overwrite config.ini), or run an updater script found in the `updater` folder.
+
+For the config, view the latest template here to see if you need to manually migrate or add new settings.
 
 
 # Setup
