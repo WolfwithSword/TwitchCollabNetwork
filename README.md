@@ -112,7 +112,9 @@ This program supports file/disk based caching. Since this program is used to gen
   - Can be in a different directory and will automatically copy the lib folder to it if not present. 
 - **-v | --version**
   - Display the current version of TwitchCollabNetwork
-- ** -h | --help**
+- **-of | --open_file**
+  - If present, open the HTML output automatically when generation is complete. This uses your system's default program for HTML files. 
+- **-h | --help**
   - Display help message for the program usage 
 
 *Examples*

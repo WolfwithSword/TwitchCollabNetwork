@@ -4,21 +4,6 @@ By: WolfwithSword
 Link: https://github.com/WolfwithSword/TwitchCollabNetwork
 
 This utility will create a network map of collabs between Twitch streamers based on tagged usernames in vod titles
-
-Command Line Parameters:
-
--c <filepath> | --conf_file <filepath>
-    Specify the config file path to use for running
-
--o <filepath> | --output_file <filepath>
-    Specify the output html filepath to use for the generated network map
-
--v | --version
-    Get the current TwitchCollabNetwork Version number and info
-
--h | --help
-    Display this message
-
 """
 
 import os
@@ -31,6 +16,7 @@ import time
 
 from datetime import datetime
 import logging
+import webbrowser
 
 from twitchAPI.twitch import Twitch
 
@@ -67,6 +53,11 @@ conf_parser.add_argument("-c", "--conf_file", help="Specify config file", metava
 conf_parser.add_argument('-o', '--output_file', help="Specify the output file", metavar="FILE", required=False)
 conf_parser.add_argument('-v', '--version', action='version',
                          version=f'TwitchCollabNetwork Version: {__version__}')
+conf_parser.add_argument('-of', '--open_file', help="Automatically open the output file when complete. "
+                                                    "This will use your system's default program for HTML files",
+                         metavar='', required=False, action=argparse.BooleanOptionalAction)
+
+conf_parser.set_defaults(open_file=False)
 
 args, remaining_argv = conf_parser.parse_known_args()
 
@@ -86,6 +77,10 @@ if args.conf_file:
 if not os.path.isfile(config_path):
     logger.error("No valid config file was found. Please setup a valid config file")
     quit()
+
+open_file = False
+if args.open_file:
+    open_file = True
 
 config = TCNConfig()
 config.setup(path=config_path)
@@ -229,6 +224,9 @@ async def twitch_run():
     if twitch_utils.cache:
         twitch_utils.cache.expire()
         twitch_utils.cache.close()
+
+    if open_file:
+        webbrowser.open_new_tab(f"file:///{os.path.abspath(OUTPUT_FILE)}")
 
 
 def all_done(users: dict, depth: int):
