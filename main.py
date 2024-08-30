@@ -57,7 +57,6 @@ custom_output = False
 
 argv = sys.argv
 conf_parser = argparse.ArgumentParser(
-    prog="twitchcollabnetwork",
     description="This utility will create a network map of collabs between "
                 "Twitch streamers based on tagged usernames in vod titles",
     epilog="By: WolfwithSword\nLink: https://github.com/WolfwithSword/TwitchCollabNetwork",
