@@ -1,3 +1,26 @@
+"""
+TwitchCollabNetwork
+By: WolfwithSword
+Link: https://github.com/WolfwithSword/TwitchCollabNetwork
+
+This utility will create a network map of collabs between Twitch streamers based on tagged usernames in vod titles
+
+Command Line Parameters:
+
+-c <filepath> | --conf_file <filepath>
+    Specify the config file path to use for running
+
+-o <filepath> | --output_file <filepath>
+    Specify the output html filepath to use for the generated network map
+
+-v | --version
+    Get the current TwitchCollabNetwork Version number and info
+
+-h | --help
+    Display this message
+
+"""
+
 import os
 import argparse
 import sys
@@ -34,13 +57,17 @@ custom_output = False
 
 argv = sys.argv
 conf_parser = argparse.ArgumentParser(
-    description=__doc__,  # -h/--help
+    prog="twitchcollabnetwork",
+    description="This utility will create a network map of collabs between "
+                "Twitch streamers based on tagged usernames in vod titles",
+    epilog="By: WolfwithSword\nLink: https://github.com/WolfwithSword/TwitchCollabNetwork",
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    add_help=False
+    add_help=True
 )
-conf_parser.add_argument("-c", "--conf_file", help="Specify config file", metavar="FILE")
-conf_parser.add_argument('-o', '--output_file', help="Specify the output file", metavar="FILE")
-conf_parser.add_argument('-v', '--version', action='version', version=f'TwitchCollabNetwork Version: {__version__}')
+conf_parser.add_argument("-c", "--conf_file", help="Specify config file", metavar="FILE", required=False)
+conf_parser.add_argument('-o', '--output_file', help="Specify the output file", metavar="FILE", required=False)
+conf_parser.add_argument('-v', '--version', action='version',
+                         version=f'TwitchCollabNetwork Version: {__version__}')
 
 args, remaining_argv = conf_parser.parse_known_args()
 
