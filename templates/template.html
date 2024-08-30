@@ -467,6 +467,14 @@
                     network.on("click", neighbourhoodHighlight);
                   {% endif %}
 
+                  network.on("doubleClick", function(data) {
+                    if (data['nodes'] != undefined) {
+                        var url = "https://twitch.tv/" + data['nodes'][0];
+                        window.open(url, '_blank').focus();
+                    }
+
+                  });
+
                   {% if select_menu %}
                     network.on("selectNode", neighbourhoodHighlight);
                   {% endif %}
@@ -477,7 +485,7 @@
                       popup.className = 'popup';
                       popupTimeout = null;
                       popup.addEventListener('mouseover', function () {
-                          console.log(popup)
+                          //console.log(popup)
                           if (popupTimeout !== null) {
                               clearTimeout(popupTimeout);
                               popupTimeout = null;
