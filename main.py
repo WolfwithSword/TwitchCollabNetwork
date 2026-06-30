@@ -110,6 +110,21 @@ if args.output_file:
 # So N=500 users, means 1000 API requests. Mitigated if using disk cache.
 
 
+def precompute(G, net):
+    # pos = nx.spring_layout(G, seed=42, k=2)
+    # pos = nx.kamada_kawai_layout(G, weight='weight')
+    # pos = nx.spring_layout(G, seed=42, k=1.5, iterations=500)
+    G_layout = G.copy()
+    G_layout.remove_edges_from(nx.selfloop_edges(G_layout))
+
+    pos = nx.forceatlas2_layout(G_layout, max_iter=400, seed=42, weight='weight')
+
+    for node in net.nodes:
+        node_id = node["id"]
+        x, y = pos[node_id]
+        node["x"] = float(x) * 2.5
+        node["y"] = float(y) * 2.5
+
 async def twitch_run():
     start_time = time.time()
     twitch = await Twitch(app_id=CLIENT_ID, app_secret=CLIENT_SECRET)
@@ -117,6 +132,13 @@ async def twitch_run():
     twitch_utils = TwitchUtils(config=config, twitch=twitch, cache_dir=cache_dir)
     users = dict()
     depth = 1
+
+    output_dir = os.path.dirname(OUTPUT_FILE)
+    pfp_dir = os.path.join(output_dir, "pfp")
+    os.makedirs(pfp_dir, exist_ok=True)
+
+    async def fetch_pfp(u):
+        users[u].cached_pfp = await twitch_utils.get_profile_image(users[u].twitch_user, pfp_dir)
 
     # Load primary users to start with
     if config.concurrency and len(config.primary_channelnames) > 1:
@@ -155,6 +177,14 @@ async def twitch_run():
 
     logger.info(f"Depth: {depth}, Users: {len(users)}")
 
+    # batch_size = 50
+    # user_keys = list(users.keys())
+    # for i in range(0, len(user_keys), batch_size):
+    #     chunk = user_keys[i:i + batch_size]
+    #     await asyncio.gather(*[fetch_pfp(u) for u in chunk])
+    #     logger.info(f"Fetched profile images {i+len(chunk)}/{len(user_keys)}")
+    #     await asyncio.sleep(0.3)
+
     ###############
     # Build Graph #
     ###############
@@ -169,6 +199,7 @@ async def twitch_run():
         G.add_node(node_for_adding=user.name, color=user.node_color, shape=config.shape,
                    title=title,
                    label=user.name,
+                   # size=size, image=user.cached_pfp,
                    size=size, image=user.twitch_user.profile_image_url,
                    url=f"https://twitch.tv/{user.name}", channel_name=user.name, connections=len(user.children),
                    border=user.node_color)
@@ -201,19 +232,53 @@ async def twitch_run():
                   heading=f"Twitch Collab Network: {','.join(config.primary_channelnames)}"
                           f"<br>{datetime.today().strftime('%Y-%m-%d')}"
                           f"<br>Depth: {depth}, Connections: {len(users)}",
-                  select_menu=False, filter_menu=True, neighborhood_highlight=True)
+                  select_menu=False, filter_menu=True, neighborhood_highlight=False)
     net.from_nx(G)
-    options = '{"nodes": {"borderWidth": 5}}'
+    precompute(G, net)
+
+    options = """{
+          "nodes": { "borderWidth": 5 },
+          "autoResize": true,
+          "layout": { "improvedLayout": false },
+          "physics": {
+            "enabled": false,
+            "stabilization": { "enabled": true },
+            "barnesHut": {
+              "damping": 0.4,
+              "springLength": 165,
+              "gravitationalConstant": -5000,
+              "avoidOverlap": 0
+            },
+            "minVelocity": 0.5,
+            "timestep": 0.5
+          }
+        }"""
+
     # net.show_buttons(filter_=True) # If uncommenting, do not set_options below
     net.set_options(options)
 
     net.set_template_dir(os.path.join(cwd, 'templates'), 'template.html')
 
-    output_dir = os.path.dirname(OUTPUT_FILE)
-
-    if custom_output and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
     net.write_html(name=OUTPUT_FILE, notebook=False, local=True, open_browser=False)
+
+    with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    custom_js = """
+           <script>
+             setTimeout(function() {
+               network.setOptions({
+                 physics: {
+                   enabled: true
+                 }
+               });
+             }, 500);
+           </script>
+    """
+
+    html = html.replace("</body>", custom_js + "</body>")
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        f.write(html)
 
     if custom_output and not os.path.exists(os.path.join(output_dir, 'lib')) and os.path.exists('lib'):
         shutil.copytree("lib", os.path.join(output_dir, "lib"))

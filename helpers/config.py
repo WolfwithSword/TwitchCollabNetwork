@@ -13,6 +13,7 @@ class TCNConfig(configparser.ConfigParser):
         self.max_concurrency: int = 1
         self.cache_user_expiry: int = 1 * 60 * 60  # 1 hour
         self.cache_vodlist_expiry: int = 1 * 60 * 10  # 10 minutes
+        # self.cache_user_pfp_expiry: int = 1 * 60 * 60 * 24 * 7  # 2 weeks
 
     def setup(self, path: str):
         self.read(path)

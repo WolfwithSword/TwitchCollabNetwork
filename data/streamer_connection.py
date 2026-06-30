@@ -10,6 +10,7 @@ class StreamerConnection(Streamer):
         self.processed = False
         self.color = "blue"
         self.collab_counts = dict()
+        self.cached_pfp = ""
 
     def add_child(self, child: Streamer):
         if child not in self.children:

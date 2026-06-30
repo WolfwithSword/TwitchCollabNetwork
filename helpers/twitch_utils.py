@@ -1,5 +1,9 @@
 import logging
 import re
+import os
+import base64
+import asyncio
+import aiohttp
 
 from twitchAPI.helper import first
 from twitchAPI.object.api import TwitchUser, Video
@@ -62,6 +66,34 @@ class TwitchUtils:
         if self.cache is not None:
             self.cache.set(key=key, expire=self.config.cache_vodlist_expiry, value=videos)
         return videos
+
+    async def get_profile_image(self, user: TwitchUser, img_dir: str) -> str:
+        safe_name = user.display_name.lower()
+        img_path = os.path.join(img_dir, f"{safe_name}.png")
+
+        if os.path.exists(img_path):
+            return f"pfp/{safe_name}.png"
+
+        if "Image" not in self.config.shape:
+            return user.profile_image_url
+
+        for attempt in range(5):  # retry up to 5 times
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(user.profile_image_url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                        if resp.status == 200:
+                            data = await resp.read()
+                            with open(img_path, "wb") as f:
+                                f.write(data)
+                            return f"pfp/{safe_name}.png"
+                        elif resp.status == 429: # rate limited
+                            await asyncio.sleep(1 * (attempt + 1))
+            except Exception as e:
+                self.logger.warning(f"Attempt {attempt + 1} failed for {user.display_name}: {e}")
+                await asyncio.sleep(0.5 * (attempt + 1))
+
+        self.logger.warning(f"All attempts failed for {user.display_name}, using remote URL")
+        return user.profile_image_url # fallback to remote URL on failure
 
     async def get_user_by_name(self, username: str):
         key = f"{username}.user"
